@@ -138,6 +138,7 @@ const popStackItem = (undoManager, stack, eventType) => {
  * filter returns false, the type/item won't be deleted even it is in the
  * undo/redo scope.
  * @property {Set<any>} [UndoManagerOptions.trackedOrigins=new Set([null])]
+ * @property {null|function(origin):any} [UndoManagerOptions.filterOrigin] Optionally filter the origin in the transaction before checking the trackedOrigins set.
  * @property {boolean} [ignoreRemoteMapChanges] Experimental. By default, the UndoManager will never overwrite remote changes. Enable this property to enable overwriting remote changes on key-value changes (Y.Map, properties on Y.Xml, etc..).
  * @property {Doc} [doc] The document that this UndoManager operates on. Only needed if typeScope is empty.
  */
@@ -161,6 +162,7 @@ export class UndoManager extends Observable {
     captureTransaction = tr => true,
     deleteFilter = () => true,
     trackedOrigins = new Set([null]),
+    filterOrigin = null,
     ignoreRemoteMapChanges = false,
     doc = /** @type {Doc} */ (array.isArray(typeScope) ? typeScope[0].doc : typeScope.doc)
   } = {}) {
@@ -193,6 +195,17 @@ export class UndoManager extends Observable {
     this.lastChange = 0
     this.ignoreRemoteMapChanges = ignoreRemoteMapChanges
     this.captureTimeout = captureTimeout
+    const isTrackedOrigin = (/** @type {string} */ origin) => {
+      if(this.trackedOrigins.has(origin)) {
+        return true
+      } else if(origin) {
+        const filteredOrigin = filterOrigin ? filterOrigin(origin) : origin
+        if(this.trackedOrigins.has(filteredOrigin)) {
+          return true
+        }
+      }
+      return false      
+    }
     /**
      * @param {Transaction} transaction
      */
@@ -201,7 +214,7 @@ export class UndoManager extends Observable {
       if (
         !this.captureTransaction(transaction) ||
         !this.scope.some(type => transaction.changedParentTypes.has(type)) ||
-        (!this.trackedOrigins.has(transaction.origin) && (!transaction.origin || !this.trackedOrigins.has(transaction.origin.constructor)))
+        !isTrackedOrigin(transaction.origin)
       ) {
         return
       }
