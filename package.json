@@ -1,11 +1,12 @@
 {
-  "name": "yjs",
-  "version": "13.5.48",
+  "name": "@circuitly/yjs",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "13.5.51",
   "description": "Shared Editing Library",
   "main": "./dist/yjs.cjs",
-  "module": "./dist/yjs.mjs",
   "types": "./dist/src/index.d.ts",
-  "type": "module",
   "sideEffects": false,
   "funding": {
     "type": "GitHub Sponsors ❤",
@@ -24,24 +25,11 @@
     "trace-deopt": "clear && rollup -c  && node --trace-deopt dist/test.cjs",
     "trace-opt": "clear && rollup -c  && node --trace-opt dist/test.cjs"
   },
-  "exports": {
-    ".": {
-      "types": "./dist/src/index.d.ts",
-      "module": "./dist/yjs.mjs",
-      "import": "./dist/yjs.mjs",
-      "require": "./dist/yjs.cjs"
-    },
-    "./src/index.js": "./src/index.js",
-    "./tests/testHelper.js": "./tests/testHelper.js",
-    "./testHelper": "./dist/testHelper.mjs",
-    "./package.json": "./package.json"
-  },
   "files": [
     "dist/yjs.*",
     "dist/src",
     "src",
     "tests/testHelper.js",
-    "dist/testHelper.mjs",
     "sponsor-y.js"
   ],
   "dictionaries": {
